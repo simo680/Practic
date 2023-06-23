@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Браузер</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        background-color: black;
+        color: white;
+      }
+
+      h1 {
+        font-size: 30px;
+      }
+
+      input[type="text"] {
+        padding: 6px;
+        font-size: 18px;
+      }
+
+      button {
+        padding: 6px 12px;
+        font-size: 18px;
+      }
+
+      h2 {
+        font-size: 20px;
+      }
+
+      ul {
+        list-style-type: none;
+        padding: 0;
+      }
+
+      li {
+        margin-bottom: 10px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1>Поиск</h1>
+    <input type="text" id="keywordInput" placeholder="Введите слово" />
+    <button onclick="sendRequest()">Искать</button>
+
+    <h2>Результаты:</h2>
+    <ul id="results"></ul>
+    <script>
+      function sendRequest() {
+        let xhr = new XMLHttpRequest();
+        xhr.open("POST", "/search", true);
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.onreadystatechange = function () {
+          if (xhr.readyState === XMLHttpRequest.DONE) {
+            if (xhr.status === 200) {
+              let response = JSON.parse(xhr.responseText);
+              showResults(response);
+            } else {
+              console.error("Ошибка при выполнении запроса");
+            }
+          }
+        };
+        let keyword = document.getElementById("keywordInput").value;
+        let data = JSON.stringify({ keyword: keyword });
+        xhr.send(data);
+      }
+      function showResults(results) {
+        let resultsContainer = document.getElementById("results");
+        resultsContainer.innerHTML = "";
+
+        if (results.length === 0) {
+          let noResultsMsg = document.createElement("p");
+          noResultsMsg.textContent =
+            "Нет результатов для данного ключевого слова.";
+          resultsContainer.appendChild(noResultsMsg);
+        } else {
+          results.forEach(function (url) {
+            let link = document.createElement("a");
+            link.href = url;
+            link.textContent = url;
+
+            let listItem = document.createElement("li");
+            listItem.appendChild(link);
+
+            resultsContainer.appendChild(listItem);
+          });
+        }
+      }
+    </script>
+  </body>
+</html>
